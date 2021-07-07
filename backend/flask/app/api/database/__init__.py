@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm.session import sessionmaker
 from app.api.database.models import *
 
-engine = create_engine(f"{os.getenv('RSC_DATABASE_URL')}")
+engine = create_engine(f"{os.getenv('DATABASE_URL')}")
 Session = sessionmaker(bind=engine)  # Session factory
 
 user_mapping = {
