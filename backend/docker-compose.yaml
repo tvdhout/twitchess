@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  flask:
+    depends_on:
+      - postgres
+    build: flask
+    container_name: flask
+    restart: unless-stopped
+    env_file:
+      - flask/api.env
+    expose:
+      - 8080
+    networks:
+      - main
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    networks:
+      - main
+      - mainipv6
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    restart: unless-stopped
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - main
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: unless-stopped
+    env_file:
+      - postgres/postgres.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres:/datadump
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - main
+
+  ipv6nat:
+    container_name: ipv6nat
+    restart: unless-stopped
+    image: robbertkl/ipv6nat
+    privileged: true
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /lib/modules:/lib/modules:ro
+
+volumes:
+  postgres_data:
+
+networks:
+  main:
+  mainipv6:
+    enable_ipv6: true
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+        - subnet: fd00::/80
