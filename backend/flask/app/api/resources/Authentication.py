@@ -14,7 +14,7 @@ __all__ = ['AuthenticateRedirect', 'Authenticate']
 
 class AuthenticateRedirect(Resource):
     """
-    url/prefix/authenticate
+    /authenticate
     """
 
     @staticmethod
@@ -59,6 +59,9 @@ class AuthenticateRedirect(Resource):
                                         'Client-Id': os.getenv('CLIENT_ID')
                                     })
                 userid = int(resp.json()['data'][0]['id'])
+                login = str(resp.json()['data'][0]['login']).lower()
+                if login != user:
+                    return {'error': 'User endpoint is not equal to twitch username.'}, 400
                 authentication = Authentication(
                     user=user,
                     userid=userid,
@@ -76,7 +79,7 @@ class AuthenticateRedirect(Resource):
 
 class Authenticate(Resource):
     """
-    url/prefix/user/authenticate
+    /<user>/authenticate
     """
     @staticmethod
     def get(user):
