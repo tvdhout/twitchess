@@ -1,0 +1,17 @@
+#lichess-arc {
+  padding: 5px;
+  border-radius: 2px;
+  background-color: #759900;
+  color: #fff;
+  cursor: pointer;
+}
+
+#lichess-arc-sub {
+  padding: 5px;
+  border-radius: 2px;
+  background: #6441A4 url('https://tvdhout.com/media/twitch.png') no-repeat left center;
+  background-size: 19px 19px;
+  background-origin: content-box;
+  color: #fff;
+  cursor: pointer;
+}

@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "Lichess Random Challenge",
+  "author": "Thijs van den Hout and Simon Lammer",
+  "description" : "Allows accepting a random (subscriber) challenge on Lichess.org",
+  "version": "2.0",
+  "homepage_url": "https://github.com/tvdhout/twitchess",
+
+  "icons": {
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.lichess.org/*", "*://lichess.org/*"],
+      "js": ["lichessARC.js"],
+      "css": ["lichessARC.css"]
+    }
+  ]
+}
