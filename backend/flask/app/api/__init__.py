@@ -14,6 +14,7 @@ api.add_resource(Authenticate, '/<string:user>/authenticate')
 api.add_resource(AuthenticateRedirect, '/authenticate')
 
 api.add_resource(Subscribers, '/<string:user>')
+api.add_resource(CreateSubscriber, '/<string:user>/create')
 # ========
 
 

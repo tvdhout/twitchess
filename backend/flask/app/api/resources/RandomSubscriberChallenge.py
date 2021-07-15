@@ -11,7 +11,7 @@ from time import sleep
 from app.api.resources.util import validate_token, get_user_auth
 from app.api.resources.Authentication import Authenticate
 
-__all__ = ['Subscribers']
+__all__ = ['Subscribers', 'CreateSubscriber']
 
 
 class Subscribers(Resource):
@@ -29,38 +29,6 @@ class Subscribers(Resource):
         result = g.session.query(g.user_mapping[user].lichess).all()
         result = [row.lichess for row in result]
         return result
-
-    @staticmethod
-    def post(user: str) -> Tuple[dict, int]:
-        """
-        [POST] method
-        Add a new subscriber to the database.
-        """
-        if user not in g.user_mapping:
-            return {'message': 'Unknown user'}, 400
-        if not validate_token(user):
-            return {'error': 'Invalid token'}, 401
-        parser = reqparse.RequestParser()
-        parser.add_argument('twitch', type=str, required=True)
-        parser.add_argument('lichess', type=str, required=True)
-        args = parser.parse_args()
-
-        if not re.match(r'^[A-Za-z][\w\d-]{1,19}$', args.lichess):
-            return {'message': f'{args.lichess} is not a valid lichess name.'}, 400
-
-        subscriber = g.user_mapping[user](
-            twitch=args.twitch.lower(),
-            lichess=args.lichess.lower()
-        )
-
-        try:
-            g.session.merge(subscriber)
-            g.session.commit()
-        except IntegrityError as e:
-            return {'IntegrityError': str(e)}, 400
-        except Exception as e:
-            return {'error': str(e)}, 500
-        return {'message': 'lichess name successfully updated.'}, 200
 
     @staticmethod
     def delete(user: str) -> Tuple[dict, int]:
@@ -142,3 +110,39 @@ class Subscribers(Resource):
             return {'message': 'No subscribers in the database to remove.'}, 200
 
         return {'message': f'Succesfully removed {nr_purged} non-subs.'}, 200
+
+
+class CreateSubscriber(Resource):
+    @staticmethod
+    def get(user: str) -> Union[List[str], Tuple[dict, int]]:
+        """
+        [POST] method
+        Add a new subscriber to the database.
+        """
+        if user not in g.user_mapping:
+            return {'message': 'Unknown user'}, 200
+        if not validate_token(user):
+            return {'error': 'Invalid token'}, 200
+        parser = reqparse.RequestParser()
+        parser.add_argument('twitch', type=str, required=True)
+        parser.add_argument('lichess', type=str, required=True)
+        args = parser.parse_args()
+
+        if args.lichess == '':
+            return {'message': f'{args.twitch} enter your lichess username after the command: !lichess username'}, 200
+        if not re.match(r'^[A-Za-z][\w\d-]{1,19}$', args.lichess):
+            return {'message': f'{args.twitch}: {args.lichess} is not a valid lichess name.'}, 200
+
+        subscriber = g.user_mapping[user](
+            twitch=args.twitch.lower(),
+            lichess=args.lichess.lower()
+        )
+
+        try:
+            g.session.merge(subscriber)
+            g.session.commit()
+        except IntegrityError as e:
+            return {'IntegrityError': str(e)}, 400
+        except Exception as e:
+            return {'error': str(e)}, 500
+        return {'message': f'lichess name for {args.twitch} set to {args.lichess}.'}, 201
