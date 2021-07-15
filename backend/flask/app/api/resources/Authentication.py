@@ -2,6 +2,7 @@ import os
 import string
 import random
 import requests
+from typing import Union, Tuple
 from flask_restful import Resource, reqparse
 from flask import g, redirect
 from sqlalchemy.exc import NoResultFound
@@ -14,14 +15,13 @@ __all__ = ['AuthenticateRedirect', 'Authenticate']
 
 class AuthenticateRedirect(Resource):
     """
-    /authenticate
+    Endpoint /authenticate
     """
-
     @staticmethod
-    def get():
+    def get() -> Tuple[Union[dict, str], int]:
         parser = reqparse.RequestParser()
-        parser.add_argument('state', location='args')
-        parser.add_argument('code', location='args')
+        parser.add_argument('state', location='args', type=str)
+        parser.add_argument('code', location='args', type=str)
         args = parser.parse_args()
         if args.state and args.code:
             try:
@@ -35,12 +35,12 @@ class AuthenticateRedirect(Resource):
             except NoResultFound:
                 return {'message': 'Not expecting a request'}, 400
             except (AttributeError, IndexError, ValueError):
-                return {'message': 'Invalid state'}
+                return {'message': 'Invalid state'}, 400
         else:
             return {'message': 'No state and/or code passed'}, 400
 
     @staticmethod
-    def create_authentication(user, code):
+    def create_authentication(user: str, code: str) -> Tuple[Union[dict, str], int]:
         resp = requests.post(f"https://id.twitch.tv/oauth2/token"
                              f"?client_id={os.getenv('CLIENT_ID')}"
                              f"&client_secret={os.getenv('CLIENT_SECRET')}"
@@ -79,10 +79,10 @@ class AuthenticateRedirect(Resource):
 
 class Authenticate(Resource):
     """
-    /<user>/authenticate
+    Endpoint /<user>/authenticate
     """
     @staticmethod
-    def get(user):
+    def get(user: str) -> Tuple[Union[dict, str], int]:
         if user not in g.user_mapping:
             return {'message': 'Unknown user'}, 400
         if not validate_token(user):
@@ -100,7 +100,7 @@ class Authenticate(Resource):
                         code=302)
 
     @staticmethod
-    def refresh(user):
+    def refresh(user: str) -> bool:
         """
         Refresh access token for user, return True if successful, False if not.
         """
@@ -116,13 +116,15 @@ class Authenticate(Resource):
                              f"&client_id={os.getenv('CLIENT_ID')}"
                              f"&client_secret={os.getenv('CLIENT_SECRET')}")
 
-        if resp.status_code != 200:
+        try:
+            resp.raise_for_status()
+        except requests.exceptions.HTTPError:
             # Refresh unsuccessful
             return False
-
-        # Update authentication token
-        data = resp.json()
-        auth.accesstoken = data['access_token']
-        auth.refreshtoken = data['refresh_token']
-        g.session.commit()
-        return True
+        else:
+            # Update authentication token
+            data = resp.json()
+            auth.accesstoken = data['access_token']
+            auth.refreshtoken = data['refresh_token']
+            g.session.commit()
+            return True

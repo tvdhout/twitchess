@@ -91,7 +91,9 @@ class Subscribers(Resource):
                     continue
                 return {'error': 'Twitch API returned 503. Check https://devstatus.twitch.tv/'}, 503
 
-            if resp.status_code != 200:
+            try:
+                resp.raise_for_status()
+            except requests.exceptions.HTTPError:
                 return {'error': f'Twitch API responded with unexepected status code {resp.status_code}'}, 500
 
             # Request successful
