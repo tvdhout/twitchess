@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Twitchess</title>
+    <link rel="stylesheet" href="../bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="popup.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="header">
+    <span id="title">TWITCHESS</span>
+</div>
+
+<div id="dots">
+    ...
+</div>
+
+<div id="connected" hidden>
+    You are connected!
+</div>
+
+<div id="not-connected" hidden>
+    You are <span style="color: #ffab61">not</span> connected.
+    <a href="https://www.twitchess.app/setup" target="_blank">
+        <button class="btn">
+            Setup Twitchess
+        </button>
+    </a>
+</div>
+
+<a href="https://www.twitchess.app/faq" target="_blank">
+    <div id="help-box" hidden>
+        Help
+    </div>
+</a>
+<script src="popup.js" charset="utf-8"></script>
+</body>
+</html>

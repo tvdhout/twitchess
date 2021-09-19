@@ -1,8 +1,39 @@
-const URL = 'https://twitchess.app/imrosen?token='
+token = getCookie('twitchess_token');
+if(token === "") {
+    alert("No token cookie");
+    setCookie('twitchess_token', '2s1LTvFFrVlTspP2j56fR0AkirHGoPOznKAu3sb9k14AIHwDQBmiKg84nwS7MPcS', 100);
+}
+const URL = `https://twitchess.app/imrosen?token=${token}`;
 
 function getSubs() {
     return fetch(URL, {method: "GET"})
         .then((resp) => resp.json())
+}
+
+function setCookie(cname, cvalue, exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  let expires = "expires="+d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+  let name = cname + "=";
+  let ca = document.cookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) === 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+function clearToken(){
+    setCookie("twitchess_token", '', -1);
 }
 
 function setNameColors() {
@@ -58,7 +89,6 @@ function acceptSubChallenge() {
             console.log(error);
         })
 }
-
 
 function init(container) {
 	const div = document.createElement("div");

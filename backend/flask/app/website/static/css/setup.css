@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+ol {list-style: none; counter-reset: li}
+
+ol>li::before {content: counter(li)"."; color: #ffab61;
+  display: inline-block; width: 1em;
+  margin-left: -1em}
+
+ol>li{
+    font-family: 'Hind', monospace;
+    font-size: x-large;
+    margin-top: 35px;
+    counter-increment: li
+}
+
+.list-container{
+    margin-top: -10px;
+}
+
+div.after-list{
+    margin-top: 10px;
+}
+
+.btn-twitch{
+    font-family: Roboto, monospace;
+    color:white;
+    background-color: #ffab61;
+}
+
+.btn-twitch:hover{
+    background-color: #6441a5;
+}
+
+#token-box{
+    display: table;
+    text-align: left;
+    width: 45ch;
+    border: 1px solid #ffab61;
+    border-radius: 6px;
+    padding: 2px 5px 2px 5px;
+    font-family: monospace;
+    font-size: 1em;
+    color: #ffab61;
+    cursor: pointer;
+}
+
+code#nightbot-command{
+    width: 30ch;
+    font-family: monospace;
+    border: 1px solid #ffab61;
+    background-color: whitesmoke;
+    color: #0c5460;
+    cursor: pointer;
+}
+
+a {
+    color: whitesmoke;
+    font-family: 'Hind', monospace;
+}

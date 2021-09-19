@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="/static/css/setup.css">
+<div class="row">
+    <div class="col-lg-12 list-container">
+        <ol>
+            <li id="install-extension">
+                <a href="https://chrome.google.com/webstore/category/extensions" target="_blank">
+                    <u>Install</u> the Twitchess Chome extension
+                </a>
+            </li>
+            <li id="authentication-text">
+                Authenticate the Twitch API
+            </li>
+            <div class="after-list">
+                <a href="https://api.twitchess.app/authenticate">
+                    <button class="btn btn-dark btn-twitch" id="twitch-auth-button">
+                        <img src="/static/media/twitch_logo.png" alt="Twitch logo" style="height: 15px">
+                        <strong style="margin-left:4px">Authenticate</strong>
+                    </button>
+                </a>
+                <label for="token-box" id="token-label" hidden>Your Twitchess token</label>
+                <div id="token-box" onclick="copyToken()" hidden>
+                    <span id="token"></span>
+                    <i class="far fa-clipboard" style="margin-left: 17px" id="clipboard-icon"></i>
+                </div>
+            </div>
+            <li>Enable the Nightbot command</li>
+            <div id="twitchess-token">
+                <code id="nightbot-command" hidden>
+                </code>
+            </div>
+            <li>All done!</li>
+        </ol>
+    </div>
+</div>
+<script type="text/javascript" src="/static/js/setup.js"></script>
+{% endblock %}

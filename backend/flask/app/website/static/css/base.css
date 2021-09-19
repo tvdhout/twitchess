@@ -1,0 +1,59 @@
+@import url('//fonts.googleapis.com/css2?family=Hind:wght@600&display=swap');
+
+body {
+    background-color: #0c5460;
+    color: whitesmoke;
+}
+
+::-moz-selection { /* Code for Firefox */
+    color: #0c5460;
+    background: whitesmoke;
+}
+
+::selection {
+    color: #0c5460;
+    background: whitesmoke;
+}
+
+div#title-bar {
+    margin-top: 20px;
+}
+
+svg>text {
+    font-family: 'Hind', monospace;
+    fill: #ffab61;
+}
+
+div.content-box{
+    /*margin-left: 3.5%;*/
+    /*margin-right: 3.5%;*/
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 7px solid #ffab61;
+}
+
+svg {
+    width: 100%;
+}
+
+a{
+    color: whitesmoke;
+    font-family: 'Hind', monospace;
+    font-size: x-large;
+    text-decoration: none;
+}
+
+a.nav-link {
+    color: whitesmoke;
+    text-decoration: none;
+}
+
+a.nav-link:hover{
+    color: #ffab61;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #ffab61;
+    text-decoration: none;
+}

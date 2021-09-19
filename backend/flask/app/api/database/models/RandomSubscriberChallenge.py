@@ -8,6 +8,7 @@ def make_subscriber_table(name: str) -> type:
     """
     class Pair(Base):
         __tablename__ = name
+        __table_args__ = {'extend_existing': True}
 
         twitch = Column(String(25), primary_key=True)
         lichess = Column(String(20), nullable=False)

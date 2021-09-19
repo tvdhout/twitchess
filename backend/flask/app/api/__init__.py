@@ -1,7 +1,7 @@
 from flask import g, Blueprint
 from flask_restful import Api
 
-from app.api.database import Session, user_mapping
+from app.api.database import Session
 from app.api.resources.Authentication import *
 from app.api.resources.RandomSubscriberChallenge import *
 
@@ -10,8 +10,9 @@ api = Api(api_blueprint)
 
 
 # ======== Add routes
-api.add_resource(Authenticate, '/<string:user>/authenticate')
-api.add_resource(AuthenticateRedirect, '/authenticate')
+api.add_resource(CheckToken, '/<string:user>/check-token')
+api.add_resource(Authenticate, '/authenticate')
+api.add_resource(AuthenticateRedirect, '/twitch-redirect')
 
 api.add_resource(Subscribers, '/<string:user>')
 api.add_resource(CreateSubscriber, '/<string:user>/create')
@@ -22,8 +23,6 @@ api.add_resource(CreateSubscriber, '/<string:user>/create')
 def before_request():
     # Database session
     g.session = Session()
-    # Dict mapping user endpoints to their respective table
-    g.user_mapping = user_mapping
 
 
 @api_blueprint.after_request

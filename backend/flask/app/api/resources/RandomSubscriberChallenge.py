@@ -6,9 +6,10 @@ from flask_restful import Resource, reqparse
 from flask import g
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql.expression import select, insert
 from time import sleep
 
-from app.api.resources.util import validate_token, get_user_auth
+from app.api.resources.util import validate_token, get_user_auth, get_table
 from app.api.resources.Authentication import Authenticate
 
 __all__ = ['Subscribers', 'CreateSubscriber']
@@ -21,12 +22,13 @@ class Subscribers(Resource):
         [GET] method
         Retrieve the Lichess usernames of all Twitch subscribers.
         """
-        if user not in g.user_mapping:
-            return {'message': 'Unknown user'}, 400
         valid = validate_token(user)
         if not valid:
-            return {'error': 'Invalid token'}, 401
-        result = g.session.query(g.user_mapping[user].lichess).all()
+            return {'error': 'Invalid token or user'}, 401
+        table = get_table(user)
+        if table is None:
+            return {'message': 'User not in system'}, 400
+        result = g.session.execute(select([table.c.lichess]))
         result = [row.lichess for row in result]
         return result
 
@@ -36,11 +38,9 @@ class Subscribers(Resource):
         [DELETE] method
         Purge users from the database that are no longer subscribed.
         """
-        if user not in g.user_mapping:
-            return {'message': 'Unknown user'}, 400
         valid, token = validate_token(user, return_token=True)
         if not valid:
-            return {'error': 'Invalid token'}, 401
+            return {'error': 'Invalid token or user'}, 401
 
         auth = get_user_auth(user)
         if auth is None:
@@ -104,47 +104,46 @@ class Subscribers(Resource):
                 done = True
 
         try:
-            subs_to_purge = g.session.query(g.user_mapping[user]).filter(~g.user_mapping[user].twitch.in_(subscribers))
-            nr_purged = subs_to_purge.count()
-            if nr_purged > 0:
-                subs_to_purge.delete(synchronize_session=False)
+            table = get_table(user)
+            if table is None:
+                return {'message': 'User not in system'}, 400
+            delete = table.delete().where(~table.c.twitch.in_(subscribers))
+            g.session.execute(delete)
         except NoResultFound:
             return {'message': 'No subscribers in the database to remove.'}, 200
-
-        return {'message': f'Succesfully removed {nr_purged} non-subs.'}, 200
+        return {'message': f'Succesfully removed non-subs.'}, 200
 
 
 class CreateSubscriber(Resource):
     @staticmethod
-    def get(user: str) -> Union[List[str], Tuple[dict, int]]:
+    def get(user: str) -> str:
         """
-        [POST] method
         Add a new subscriber to the database.
+        Return the message sent by nightbot as a response
         """
-        if user not in g.user_mapping:
-            return {'message': 'Unknown user'}, 200
         if not validate_token(user):
-            return {'error': 'Invalid token'}, 200
+            return f'error: Invalid Twitchess token for "{user}"'
         parser = reqparse.RequestParser()
         parser.add_argument('twitch', type=str, required=True)
         parser.add_argument('lichess', type=str, required=True)
         args = parser.parse_args()
 
         if args.lichess == '':
-            return {'message': f'{args.twitch} enter your lichess username after the command: !lichess username'}, 200
+            return f'@{args.twitch}: enter your lichess username after the command: !lichess username'
         if not re.match(r'^[A-Za-z][\w\d-]{1,19}$', args.lichess):
-            return {'message': f'{args.twitch}: {args.lichess} is not a valid lichess name.'}, 200
+            return f'@{args.twitch}: {args.lichess} is not a valid lichess name.'
 
-        subscriber = g.user_mapping[user](
-            twitch=args.twitch.lower(),
-            lichess=args.lichess.lower()
-        )
+        table = get_table(user)
+        if table is None:
+            return f'{user} is not in the database. Authenticate online at twitchess.app/setup'
 
         try:
-            g.session.merge(subscriber)
+            g.session.execute(insert(table).values(twitch=args.twitch.lower(),
+                                                   lichess=args.lichess.lower()))
             g.session.commit()
-        except IntegrityError as e:
-            return {'IntegrityError': str(e)}, 400
+        except IntegrityError:
+            return f'Error: Database error, please inform the developer at https://github.com/tvdhout/twitchess/issues '
         except Exception as e:
-            return {'error': str(e)}, 500
-        return {'message': f'lichess name for {args.twitch} set to {args.lichess}.'}, 201
+            return f'Unknown error: {str(e)[:75]}... please report at ' \
+                   f'https://github.com/tvdhout/twitchess/issues '
+        return f'Lichess name for @{args.twitch} set to {args.lichess}.'

@@ -1,0 +1,45 @@
+{
+  "name": "Twitchess",
+  "description": "Accept Lichess challenges from Twitch subscribers.",
+  "version": "0.1.0",
+  "author": "Thijs van den Hout",
+  "homepage_url": "https://twitchess.app",
+  "manifest_version": 3,
+  "icons": {
+    "16": "/images/logo512.png",
+    "32": "/images/logo512.png",
+    "48": "/images/logo512.png",
+    "128": "/images/logo512.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icons": {
+      "16": "/images/logo512.png",
+      "32": "/images/logo512.png",
+      "48": "/images/logo512.png",
+      "128": "/images/logo512.png"
+    }
+  },
+  "options_page": "options_page/options.html",
+  "permissions": [
+    "tabs",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+      "https://*.lichess.org/*",
+      "https://lichess.org/*",
+      "https://*.twitchess.app/*"
+    ],
+  "web_accessible_resources": [{
+    "resources": ["images/twitch_logo.png"],
+    "matches": [
+      "*://*.lichess.org/*",
+      "*://lichess.org/*",
+      "https://*.twitchess.app/*"
+    ]
+  }]
+}

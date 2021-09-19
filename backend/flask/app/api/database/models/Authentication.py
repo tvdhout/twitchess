@@ -1,5 +1,7 @@
-from sqlalchemy import Column, String, Integer
+from datetime import datetime
+from sqlalchemy import Column, String, Integer, DateTime
 from sqlalchemy.dialects.postgresql import ARRAY
+
 from app.api.database.models import Base
 
 __all__ = ['Authentication', 'Login', 'StateToken']
@@ -26,14 +28,14 @@ class Login(Base):
     __tablename__ = 'login'
 
     username = Column(String(30), primary_key=True)
-    token = Column(String(64))
+    token = Column(String(40))
 
 
 class StateToken(Base):
     __tablename__ = 'states'
 
-    user = Column(String(30), primary_key=True)
-    state = Column(String(30))
+    datetime = Column(DateTime, default=datetime.now())
+    state = Column(String(64), primary_key=True)
 
     def dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

@@ -1,0 +1,2 @@
+console.log("Loaded twitchess.js");
+document.getElementById('install-extension').innerHTML = '<strike>Install the Twitchess Chrome extension</strike> <span style="color:#ffab61;"><i class="fas fa-check"></i> Installed</span>'

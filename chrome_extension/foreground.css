@@ -1,0 +1,14 @@
+div#random-challenge {
+    padding: 5px;
+    border-radius: 2px;
+    background-color: #759900;
+    color: #fff;
+    cursor: pointer;
+}
+
+div#subscriber-challenge {
+    padding: 5px;
+    border-radius: 2px;
+    color: #fff;
+    cursor: pointer;
+}
