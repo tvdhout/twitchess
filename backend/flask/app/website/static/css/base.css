@@ -15,8 +15,21 @@ body {
     background: whitesmoke;
 }
 
+ol {list-style: none; counter-reset: li}
+
+ol>li::before {content: counter(li)"."; color: #ffab61;
+  display: inline-block; width: 1em;
+  margin-left: -1em}
+
+ol>li{
+    font-family: 'Hind', monospace;
+    font-size: x-large;
+    margin-top: 30px;
+    counter-increment: li
+}
+
 div#title-bar {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 svg>text {
@@ -27,7 +40,7 @@ svg>text {
 div.content-box{
     /*margin-left: 3.5%;*/
     /*margin-right: 3.5%;*/
-    margin-top: 10px;
+    margin-top: 5px;
     padding-top: 10px;
     border-top: 7px solid #ffab61;
 }

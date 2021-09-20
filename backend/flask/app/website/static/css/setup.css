@@ -1,59 +1,62 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
-ol {list-style: none; counter-reset: li}
-
-ol>li::before {content: counter(li)"."; color: #ffab61;
-  display: inline-block; width: 1em;
-  margin-left: -1em}
-
-ol>li{
-    font-family: 'Hind', monospace;
-    font-size: x-large;
-    margin-top: 35px;
-    counter-increment: li
-}
-
-.list-container{
+.list-container {
     margin-top: -10px;
 }
 
-div.after-list{
+div.after-list {
     margin-top: 10px;
 }
 
-.btn-twitch{
+.btn-twitch {
     font-family: Roboto, monospace;
-    color:white;
+    color: white;
     background-color: #ffab61;
 }
 
-.btn-twitch:hover{
+.btn-twitch:hover {
     background-color: #6441a5;
 }
 
-#token-box{
-    display: table;
-    text-align: left;
-    width: 45ch;
-    border: 1px solid #ffab61;
-    border-radius: 6px;
-    padding: 2px 5px 2px 5px;
-    font-family: monospace;
-    font-size: 1em;
+#clipboard-icon {
+    display: inline;
     color: #ffab61;
+    font-size: 1.5em;
+    margin-left: 7px;
     cursor: pointer;
 }
 
-code#nightbot-command{
-    width: 30ch;
+span#copied{
+    color: #ffab61;
+    font-size: 1em;
+    margin-left: 4px;
+}
+
+div#nightbot-command {
+    display: inline-block;
+    margin-top: 10px;
     font-family: monospace;
+    word-wrap: break-word;
+    width: 46ch;
     border: 1px solid #ffab61;
-    background-color: whitesmoke;
-    color: #0c5460;
+    padding: 8px;
+    border-radius: 5px;
     cursor: pointer;
 }
 
 a {
     color: whitesmoke;
     font-family: 'Hind', monospace;
+}
+
+a#small {
+    font-size: initial;
+}
+
+code {
+    color: #ffab61;
+}
+
+#extra-special {
+    cursor: pointer;
 }

@@ -13,6 +13,11 @@ def setup():
     return render_template("setup.html")
 
 
+@website_blueprint.route('/faq')
+def faq():
+    return render_template("faq.html")
+
+
 @website_blueprint.route('/not-eligible')
 def not_elibigle():
     return render_template("not-eligible.html")

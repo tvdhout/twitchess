@@ -6,7 +6,8 @@ from flask_restful import Resource, reqparse
 from flask import g
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql.expression import select, insert
+from sqlalchemy.sql.expression import select
+from sqlalchemy.dialects.postgresql import insert
 from time import sleep
 
 from app.api.resources.util import validate_token, get_user_auth, get_table
@@ -122,14 +123,14 @@ class CreateSubscriber(Resource):
         Return the message sent by nightbot as a response
         """
         if not validate_token(user):
-            return f'error: Invalid Twitchess token for "{user}"'
+            return f'Error: Invalid Twitchess token. Please notify the streamer.'
         parser = reqparse.RequestParser()
         parser.add_argument('twitch', type=str, required=True)
         parser.add_argument('lichess', type=str, required=True)
         args = parser.parse_args()
 
         if args.lichess == '':
-            return f'@{args.twitch}: enter your lichess username after the command: !lichess username'
+            return f'@{args.twitch}: give your lichess username right after the command'
         if not re.match(r'^[A-Za-z][\w\d-]{1,19}$', args.lichess):
             return f'@{args.twitch}: {args.lichess} is not a valid lichess name.'
 
@@ -138,10 +139,15 @@ class CreateSubscriber(Resource):
             return f'{user} is not in the database. Authenticate online at twitchess.app/setup'
 
         try:
-            g.session.execute(insert(table).values(twitch=args.twitch.lower(),
-                                                   lichess=args.lichess.lower()))
+            stmt = insert(table).values(twitch=args.twitch.lower(),
+                                        lichess=args.lichess.lower())
+            stmt = stmt.on_conflict_do_update(
+                constraint=f'{user}_pkey',
+                set_=dict(lichess=args.lichess.lower())
+            )
+            g.session.execute(stmt)
             g.session.commit()
-        except IntegrityError:
+        except IntegrityError as e:
             return f'Error: Database error, please inform the developer at https://github.com/tvdhout/twitchess/issues '
         except Exception as e:
             return f'Unknown error: {str(e)[:75]}... please report at ' \

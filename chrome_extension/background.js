@@ -57,9 +57,12 @@ function checkConnection(sendResponse){
                     'valid': false
                 })
             })
-            .then(data => {
+            .then(resp => {
+                const valid = resp['valid']
                 sendResponse({
-                    'valid': data['valid']
+                    'valid': valid,
+                    'user': valid ? data.user : null,
+                    'token': valid ? data.sessionToken : null
                 });
             });
     })

@@ -6,8 +6,16 @@ function setNameColors() {
         Array.from(challenges).forEach(challenge => {
             const challengerName = challenge.getElementsByClassName("user-link")[0].innerText
                 .split(" ")[0].toLowerCase();
-            if (subs.includes(challengerName)) {
-                challenge.getElementsByClassName("user-link")[0].style.color = "#9e84ce";
+            try{
+                if (subs.includes(challengerName)) {
+                    challenge.getElementsByClassName("user-link")[0].style.color = "#9e84ce";
+                }
+            } catch (TypeError) {  // Invalid (or no) user/token
+                const challengeButton = document.getElementById('subscriber-challenge')
+                challengeButton.style.background = '';
+                challengeButton.style.backgroundColor = '#880909';
+                challengeButton.innerHTML = "Click here to setup Twitchess before you can accept subscriber challenges.";
+                challengeButton.onclick = () => location.href='https://www.twitchess.app/setup';
             }
         })
     })
@@ -80,6 +88,7 @@ function initWhenContainerLoaded() {
         setTimeout(initWhenContainerLoaded, 100);
     }
     document.getElementById('challenge-toggle').addEventListener("click", setNameColors);
+    document.getElementById("challenge-app").addEventListener("mouseenter", setNameColors);
 }
 
 initWhenContainerLoaded();

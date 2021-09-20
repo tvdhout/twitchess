@@ -14,21 +14,31 @@
             </li>
             <div class="after-list">
                 <a href="https://api.twitchess.app/authenticate">
-                    <button class="btn btn-dark btn-twitch" id="twitch-auth-button">
+                    <button class="btn btn-dark btn-twitch">
                         <img src="/static/media/twitch_logo.png" alt="Twitch logo" style="height: 15px">
-                        <strong style="margin-left:4px">Authenticate</strong>
+                        <strong style="margin-left:4px" id="twitch-button-text">Authenticate</strong>
                     </button>
                 </a>
-                <label for="token-box" id="token-label" hidden>Your Twitchess token</label>
-                <div id="token-box" onclick="copyToken()" hidden>
-                    <span id="token"></span>
-                    <i class="far fa-clipboard" style="margin-left: 17px" id="clipboard-icon"></i>
-                </div>
             </div>
             <li>Enable the Nightbot command</li>
-            <div id="twitchess-token">
-                <code id="nightbot-command" hidden>
-                </code>
+            <div id="nightbot-box" hidden>
+                <ul>
+                    <li>
+                        <a href="https://nightbot.tv/commands/custom" target="_blank" id="small">Add a custom
+                            command</a> <code>!lichess</code>
+                        with
+                        user level Subscriber
+                    </li>
+                    <li>
+                        Use the following message for the command:
+                    </li>
+                </ul>
+                <div onclick="copyCommand(this)">
+                    <div id="nightbot-command"></div>
+                    <div style="display: inline-block; top: 0">
+                        <i class="far fa-clipboard" id="clipboard-icon"></i><span id="copied" hidden> Copied</span>
+                    </div>
+                </div>
             </div>
             <li>All done!</li>
         </ol>
