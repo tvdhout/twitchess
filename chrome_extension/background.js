@@ -3,7 +3,7 @@
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     // Check if tab is loaded completely, and if the domain is lichess.org
     // Inject CSS / javascript on loading lichess
-    if (changeInfo.status === 'complete' && /^https?:\/\/(\w*\.)?lichess\.org\//.test(tab.url)) {
+    if (changeInfo.status === 'complete' && /^https?:\/\/(?:\w*\.)?lichess\.org(?!\/api(\/|#|\?|$))/.test(tab.url)) {
         chrome.scripting.insertCSS({
             target: {tabId: tabId},
             files: ['foreground.css']

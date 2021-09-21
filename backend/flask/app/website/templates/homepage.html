@@ -1,6 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-<div>
-    <i class="fas fa-check"></i>
+<div class="row">
+    <div class="col-lg-12" style="font-size: 20px">
+        <p>
+            Twitchess is a browser extension that lets you accept Lichess challenges from your Twitch subscribers.
+        </p>
+        <p>
+            The application is made up of three components:
+        </p>
+        <ul class="colored">
+            <li>
+                The Twitchess browser extension
+            </li>
+            <li>
+                A Nightbot command on Twitch
+            </li>
+            <li>
+                A complicated backend to glue everything together
+            </li>
+        </ul>
+        <p>If you are a Twitch parter or affiliate (meaning viewers can subscribe to your channel) you can use Twitchess.</p>
+        <p>Use the <a href="{{ url_for('website.setup') }}" id="home-setup-link">setup guide</a> to get started!</p>
+        <div style="width: 100%; display: flex; justify-content: center">
+            <img src="/static/media/twitchess-in-action.png" alt="Twitchess screenshot" style="width: 320px;">
+        </div>
+    </div>
 </div>
 {% endblock %}

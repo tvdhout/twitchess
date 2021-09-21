@@ -28,6 +28,19 @@ ol>li{
     counter-increment: li
 }
 
+ul.colored {
+  list-style: none;
+}
+
+ul.colored>li::before {
+  content: "\2022";
+  color: #ffab61;
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1.2em;
+}
+
 div#title-bar {
     margin-top: 15px;
 }
@@ -38,10 +51,9 @@ svg>text {
 }
 
 div.content-box{
-    /*margin-left: 3.5%;*/
-    /*margin-right: 3.5%;*/
     margin-top: 5px;
     padding-top: 10px;
+    padding-bottom: 10px;
     border-top: 7px solid #ffab61;
 }
 
@@ -69,4 +81,17 @@ a.nav-link:hover{
 a:hover {
     color: #ffab61;
     text-decoration: none;
+}
+
+a.small {
+    font-size: initial;
+}
+
+a#home-setup-link{
+    font-size: 20px;
+    color: #ffab61;
+}
+
+a#home-setup-link:hover{
+    color: whitesmoke;
 }

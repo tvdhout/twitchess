@@ -146,12 +146,13 @@ class Authenticate(Resource):
                         code=302)
 
     @staticmethod
-    def refresh(user: str) -> bool:
+    def refresh(user: str, session=None) -> bool:
         """
         Refresh access token for user, return True if successful, False if not.
         """
+        session = session or g.session
         try:
-            auth = g.session.query(Authentication).filter(Authentication.user == user).one()
+            auth = session.query(Authentication).filter(Authentication.user == user).one()
         except NoResultFound:
             return False
 
@@ -172,5 +173,5 @@ class Authenticate(Resource):
             data = resp.json()
             auth.accesstoken = data['access_token']
             auth.refreshtoken = data['refresh_token']
-            g.session.commit()
+            session.commit()
             return True

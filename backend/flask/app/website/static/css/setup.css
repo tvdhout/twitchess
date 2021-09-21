@@ -49,14 +49,6 @@ a {
     font-family: 'Hind', monospace;
 }
 
-a#small {
-    font-size: initial;
-}
-
 code {
     color: #ffab61;
-}
-
-#extra-special {
-    cursor: pointer;
 }

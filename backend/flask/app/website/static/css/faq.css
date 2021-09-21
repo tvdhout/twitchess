@@ -1,0 +1,13 @@
+li>div{
+    font-size: 15px;
+    color: whitesmoke;
+}
+
+li:hover{
+    cursor: pointer;
+    color: #ffab61;
+}
+
+a{
+    text-decoration: underline;
+}

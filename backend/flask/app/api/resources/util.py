@@ -1,4 +1,4 @@
-from typing import Union, Tuple
+from typing import Union, Tuple, Dict
 from flask_restful import reqparse
 from flask import g
 from sqlalchemy.orm.exc import NoResultFound
@@ -7,14 +7,20 @@ from app.api.database import engine
 from app.api.database.models import Base
 from app.api.database.models.Authentication import Login, Authentication
 
+__all__ = ['get_all_tables', 'get_table', 'safe_str_cmp', 'validate_token', 'get_user_auth']
+
+
+def get_all_tables() -> Dict[str, Base]:
+    Base.metadata.reflect(engine)
+    return Base.metadata.tables
+
 
 def get_table(tablename: str) -> Union[Base, None]:
     """
     Get database table by tablename
     """
     try:
-        Base.metadata.reflect(engine)
-        return Base.metadata.tables[tablename]
+        return get_all_tables()[tablename]
     except KeyError:
         return None
 
@@ -40,12 +46,13 @@ def validate_token(user: str, return_token: bool = False) -> Union[bool, Tuple[b
     return (is_valid, token) if return_token else is_valid
 
 
-def get_user_auth(user: str) -> Union[Authentication, None]:
+def get_user_auth(user: str, session=None) -> Union[Authentication, None]:
     """
     Retrieve Authentication object from the database for user,
     """
     try:
-        auth = g.session.query(Authentication).filter(Authentication.user == user).one()
+        session = session or g.session
+        auth = session.query(Authentication).filter(Authentication.user == user).one()
     except NoResultFound:
         return None
     return auth

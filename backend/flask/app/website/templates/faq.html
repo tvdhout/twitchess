@@ -1,11 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
+<link rel="stylesheet" type="text/css" href="/static/css/faq.css">
 <ol>
-    <li>
-        How it work?
+    <li onclick="expandAndHide(this)">
+        How does it work?
+        <div hidden>
+            Twitch viewers provide their Lichess username through the Nightbot command. This is sent to the Twitchess server, on which it is saved in a database. Using the browser extension, the list of subscribers' lichess usernames is retrieved and checked against your prending challenges. This way Twitchess knows which of your pending challenges is from a Twitch subscriber; those challenges are colored purple.
+        </div>
     </li>
-    <li>
-        How it stop?
+    <li onclick="expandAndHide(this)">
+        Why do you need me to authenticate a Twitch application?
+        <div hidden>
+            This is required to request a list of your current Twitch subscribers. This list is used to check if the users in the database are still subscribed to you. If not, they are removed from the database. This way we ensure that the subscribers in Twitchess are actually still subcribed!
+        </div>
+    </li>
+    <li onclick="expandAndHide(this)">
+        What data is stored and used by Twitchess?
+        <div hidden>
+            Twitchess keeps track of a list of [Twitch, Lichess] username pairs, which are provided by your Twitch subscribers in the chat using the Nightbot command. Twitchess also stores your Twitch username, Twitch authentication token and Twitchess token, so the browser extension knows whose subscribers to retrieve. That's it.
+        </div>
+    </li>
+    <li onclick="expandAndHide(this)">
+        The Nightbot command looks scary, what does it do?
+        <div hidden>
+            $urlfetch visits the URL provided afterwards. In this case, it calls the Twitchess <a href="https://en.wikipedia.org/wiki/API" class="small" target="_blank">API</a> and tells it to create (or update) a subscriber entry in your subscriber database. With the parameters "twitch" and "lichess" in the <a href="https://en.wikipedia.org/wiki/Query_string" class="small" target="_blank">query string</a>, the usernames are defined, and the token provided is your personal (secret) Twitchess authentication code, to make sure the request is made on your behalf. The API returns a feedback message like "Lichess username succesfully changed" which is then sent by Nightbot in the chat. $eval just removes the quotes around the feedback message.
+        </div>
+    </li>
+    <li onclick="expandAndHide(this)">
+        The Nightbot command gives an error or doesn't work anymore, what to do?
+        <div hidden>
+            First, check if your Nightbot command is configured properly. It should send the message as displayed on the <a href="{{ url_for('website.setup') }}" class="small">setup page</a>. If it still does not behave properly, Regenerate the token on the setup page and use the newly generated Nightbot command. If it STILL doesn't work, <a href="https://github.com/tvdhout/twitchess/issues" class="small" target="_blank">report the issue on GitHub</a>
+        </div>
+    </li>
+    <li onclick="expandAndHide(this)">
+        I don't want to use Twitchess anymore. How do I disconnect?
+        <div hidden>
+            You can <a href="https://www.twitch.tv/settings/connections" class="small" target="_blank">unauthorize the Twitch application here</a> (under "Other Connections"). Then simply remove the browser extension and the Nightbot command.
+        </div>
+    </li>
+    <li onclick="expandAndHide(this)">
+        I need more help or want to ask a question.
+        <div hidden>
+            Please file an issue on the <a href="https://github.com/tvdhout/twitchess/issues" class="small" target="_blank">issues page on GitHub</a>, I will receive a notification and help you out.
+        </div>
     </li>
 </ol>
+<script type="text/javascript" src="/static/js/faq.js"></script>
 {% endblock %}

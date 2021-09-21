@@ -1,6 +1,7 @@
 import os
 import re
 import requests
+import logging
 from typing import Tuple, List, Union
 from flask_restful import Resource, reqparse
 from flask import g
@@ -10,10 +11,16 @@ from sqlalchemy.sql.expression import select
 from sqlalchemy.dialects.postgresql import insert
 from time import sleep
 
-from app.api.resources.util import validate_token, get_user_auth, get_table
+from app.api.resources.util import validate_token, get_user_auth, get_table, get_all_tables
 from app.api.resources.Authentication import Authenticate
 
-__all__ = ['Subscribers', 'CreateSubscriber']
+__all__ = ['Subscribers', 'CreateSubscriber', 'delete_non_subs', 'delete_everyones_non_subs']
+LOGGER = logging.getLogger(__name__)
+os.makedirs('/logging', exist_ok=True)
+file_handler = logging.FileHandler('/logging/remove_non_subs.log')
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+LOGGER.addHandler(file_handler)
 
 
 class Subscribers(Resource):
@@ -32,87 +39,6 @@ class Subscribers(Resource):
         result = g.session.execute(select([table.c.lichess]))
         result = [row.lichess for row in result]
         return result
-
-    @staticmethod
-    def delete(user: str) -> Tuple[dict, int]:
-        """
-        [DELETE] method
-        Purge users from the database that are no longer subscribed.
-        """
-        valid, token = validate_token(user, return_token=True)
-        if not valid:
-            return {'error': 'Invalid token or user'}, 401
-
-        auth = get_user_auth(user)
-        if auth is None:
-            return {'error': f'No authentication object found for {user}'}, 401
-
-        token_refreshed = False  # The token has been refreshed since the start of this request
-        retry_503 = True
-        subscribers = []
-        cursor = None  # Pagination cursor: tells the server where to start fetching the next set of results
-        done = False  # All subscribers retrieved from Twitch API
-        while not done:  # Need subsequent requests to obtain more subscribers (max 100 per request)
-            if token_refreshed:
-                auth = get_user_auth(user)
-                if auth is None:
-                    return {'error': f'No authentication object found for {user}'}, 401
-
-            resp = requests.get(f"https://api.twitch.tv/helix/subscriptions"
-                                f"?broadcaster_id={auth.userid}"
-                                f"&first=100" +
-                                f"&after={cursor}" * (cursor is not None),
-                                headers={
-                                    'Authorization': f'Bearer {auth.accesstoken}',
-                                    'Client-Id': os.getenv('CLIENT_ID')
-                                })
-
-            if resp.status_code == 400:
-                return {'error': 'User must be a Twitch partner or affiliate.'}, 400
-            elif resp.status_code == 401:
-                # Unauthorized, try to refresh access token
-                if token_refreshed:
-                    # Access token is recently refreshed, but still not authorized
-                    return {'error': 'No valid access token available, please reauthorize application'}, 401
-                refresh_successful = Authenticate.refresh(user)
-                if refresh_successful:
-                    token_refreshed = True
-                    print("Token refreshed")
-                    continue
-                else:
-                    return {'error': 'Could not refresh an unauthorized token, please reautherize application'}, 401
-            elif resp.status_code == 429:
-                # Twitch API rate limit hit (800 / minute)
-                sleep(2)
-                continue
-            elif resp.status_code == 503:
-                # Retry once; if 503 again there probably is something wrong with the Twitch API
-                if retry_503:
-                    retry_503 = False
-                    continue
-                return {'error': 'Twitch API returned 503. Check https://devstatus.twitch.tv/'}, 503
-
-            try:
-                resp.raise_for_status()
-            except requests.exceptions.HTTPError:
-                return {'error': f'Twitch API responded with unexepected status code {resp.status_code}'}, 500
-
-            # Request successful
-            data = resp.json()
-            subscribers.extend([obj['user_name'].lower() for obj in data['data']])
-            cursor = data['pagination'].get('cursor', None)
-            if cursor is None:
-                done = True
-
-        try:
-            table = get_table(user)
-            if table is None:
-                return {'message': 'User not in system'}, 400
-            delete = table.delete().where(~table.c.twitch.in_(subscribers))
-            g.session.execute(delete)
-        except NoResultFound:
-            return {'message': 'No subscribers in the database to remove.'}, 200
-        return {'message': f'Succesfully removed non-subs.'}, 200
 
 
 class CreateSubscriber(Resource):
@@ -147,9 +73,100 @@ class CreateSubscriber(Resource):
             )
             g.session.execute(stmt)
             g.session.commit()
-        except IntegrityError as e:
+        except IntegrityError:
             return f'Error: Database error, please inform the developer at https://github.com/tvdhout/twitchess/issues '
         except Exception as e:
             return f'Unknown error: {str(e)[:75]}... please report at ' \
                    f'https://github.com/tvdhout/twitchess/issues '
         return f'Lichess name for @{args.twitch} set to {args.lichess}.'
+
+
+def delete_non_subs(user: str, session) -> Tuple[bool, dict]:
+    """
+    [DELETE] method
+    Purge users from the database that are no longer subscribed.
+    """
+    auth = get_user_auth(user, session=session)
+    if auth is None:
+        return False, {'error': f'No authentication object found for {user}'}
+
+    token_refreshed = False  # The token has been refreshed since the start of this request
+    retry_503 = True
+    subscribers = []
+    cursor = None  # Pagination cursor: tells the server where to start fetching the next set of results
+    done = False  # All subscribers retrieved from Twitch API
+    while not done:  # Need subsequent requests to obtain more subscribers (max 100 per request)
+        if token_refreshed:
+            auth = get_user_auth(user, session)
+            if auth is None:
+                return False, {'error': f'No authentication object found for {user}'}
+
+        resp = requests.get(f"https://api.twitch.tv/helix/subscriptions"
+                            f"?broadcaster_id={auth.userid}"
+                            f"&first=100" +
+                            f"&after={cursor}" * (cursor is not None),
+                            headers={
+                                'Authorization': f'Bearer {auth.accesstoken}',
+                                'Client-Id': os.getenv('CLIENT_ID')
+                            })
+
+        if resp.status_code == 400:
+            return False, {'error': 'User must be a Twitch partner or affiliate.'}
+        elif resp.status_code == 401:
+            # Unauthorized, try to refresh access token
+            if token_refreshed:
+                # Access token is recently refreshed, but still not authorized
+                return False, {'error': 'No valid access token available, please reauthorize application'}
+            refresh_successful = Authenticate.refresh(user, session)
+            if refresh_successful:
+                token_refreshed = True
+                continue
+            else:
+                return False, {'error': 'Could not refresh an unauthorized token, please reautherize application'}
+        elif resp.status_code == 429:
+            # Twitch API rate limit hit (800 / minute)
+            sleep(2)
+            continue
+        elif resp.status_code == 503:
+            # Retry once; if 503 again there probably is something wrong with the Twitch API
+            if retry_503:
+                retry_503 = False
+                continue
+            return False, {'error': 'Twitch API returned 503. Check https://devstatus.twitch.tv/'}
+
+        try:
+            resp.raise_for_status()
+        except requests.exceptions.HTTPError:
+            return False, {'error': f'Twitch API responded with unexepected status code {resp.status_code}'}
+
+        # Request successful
+        data = resp.json()
+        subscribers.extend([obj['user_name'].lower() for obj in data['data']])
+        cursor = data['pagination'].get('cursor', None)
+        if cursor is None:
+            done = True
+
+    try:
+        table = get_table(user)
+        if table is None:
+            print("HERE")
+            return False, {'message': 'User not in system'}
+        delete = table.delete().where(~table.c.twitch.in_(subscribers))
+        session.execute(delete)
+    except NoResultFound:
+        return True, {'message': 'No subscribers in the database to remove.'}
+    return True, {'message': f'Succesfully removed non-subs.'}
+
+
+def delete_everyones_non_subs(app_context, session_maker):
+    with app_context():
+        session = session_maker()
+        tables = get_all_tables()
+        for name in tables.keys():
+            if name.lower() in ['login', 'authentication', 'states', 'stockvis']:
+                continue
+            success, message = delete_non_subs(name, session)
+            LOGGER.info(f"{success} - {str(message)}")
+        session.commit()
+        session.flush()
+        session.close()
