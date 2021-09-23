@@ -11,7 +11,7 @@ from sqlalchemy import or_
 
 from app.api.resources.util import validate_token
 from app.api.database import engine
-from app.api.database.models.Authentication import Authentication, Login, StateToken
+from app.api.database.models.Authentication import Authentication, User, StateToken
 from app.api.database.models.RandomSubscriberChallenge import make_subscriber_table, Base
 
 __all__ = ['CheckToken', 'AuthenticateRedirect', 'Authenticate']
@@ -61,7 +61,7 @@ class AuthenticateRedirect(Resource):
                                                 'Client-Id': os.getenv('CLIENT_ID')
                                             })
 
-                        # TODO uncomment
+                        # TODO uncomment to disallow non-partners
                         # if resp.status_code == 400:  # Not a Twitch partner or affiliate
                         #     g.session.delete(authentication)
                         #     return redirect(f'https://www.twitchess.app/not-eligible')
@@ -71,7 +71,7 @@ class AuthenticateRedirect(Resource):
                         Base.metadata.create_all(bind=engine)
                         login_token = ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits)
                                               for _ in range(40))
-                        login = Login(  # TODO: maybe don't always make a new login token
+                        login = User(  # TODO: maybe don't always make a new login token
                             username=username,
                             token=login_token
                         )

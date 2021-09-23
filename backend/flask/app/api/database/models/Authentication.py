@@ -4,7 +4,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 from app.api.database.models import Base
 
-__all__ = ['Authentication', 'Login', 'StateToken']
+__all__ = ['Authentication', 'User', 'StateToken']
 
 
 class Authentication(Base):
@@ -24,11 +24,12 @@ class Authentication(Base):
         return f'Authentication(user={self.user}, scope={str(self.scope)})'
 
 
-class Login(Base):
-    __tablename__ = 'login'
+class User(Base):
+    __tablename__ = 'users'
 
     username = Column(String(30), primary_key=True)
     token = Column(String(40))
+    last_purged = Column(DateTime, default=datetime.now())
 
 
 class StateToken(Base):

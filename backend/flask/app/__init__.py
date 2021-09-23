@@ -21,5 +21,6 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(func=delete_everyones_non_subs, kwargs={'app_context': app.app_context, 'session_maker': Session},
                   trigger='interval', hours=12)
 scheduler.start()
+print("=================> started scheduler.")
 
 atexit.register(scheduler.shutdown)  # Shut down scheduler when app closes
