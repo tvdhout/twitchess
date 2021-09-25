@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from typing import Union, Tuple
 from flask_restful import Resource, reqparse
 from flask import g, redirect, Response
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, IntegrityError
 from sqlalchemy import or_
 
 from app.api.resources.util import validate_token
@@ -66,18 +66,21 @@ class AuthenticateRedirect(Resource):
                         #     g.session.delete(authentication)
                         #     return redirect(f'https://www.twitchess.app/not-eligible')
 
-                        # All good, make a subscriber table and access token in the backend
                         make_subscriber_table(username)
                         Base.metadata.create_all(bind=engine)
-                        login_token = ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits)
-                                              for _ in range(40))
-                        login = User(  # TODO: maybe don't always make a new login token
-                            username=username,
-                            token=login_token
-                        )
-                        g.session.merge(login)
-                        g.session.commit()
-                        return redirect(f'https://www.twitchess.app/setup?user={username}&token={login_token}')
+
+                        try:
+                            user = g.session.query(User).filter(User.username == username).one()
+                        except NoResultFound:
+                            login_token = ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits)
+                                                  for _ in range(40))
+                            user = User(
+                                username=username,
+                                token=login_token
+                            )
+                            g.session.merge(user)
+                            g.session.commit()
+                        return redirect(f'https://www.twitchess.app/setup?user={username}&token={user.token}')
 
                 raise ValueError
             except AttributeError:

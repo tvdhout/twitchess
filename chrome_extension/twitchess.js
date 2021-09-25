@@ -3,6 +3,7 @@ document.getElementById('install-extension').innerHTML = '<strike>Install the Tw
 chrome.runtime.sendMessage({'message': 'check_connected'}, response => {
     if(response.valid){
         document.getElementById('twitch-button-text').innerHTML = 'Generate new token';
+        document.getElementById('authenticate-button').href = 'https://api.twitchess.app/authenticate/new-token'
         document.getElementById('authentication-text').innerHTML = '<strike>Authenticate the Twitch API</strike> <span style="color:#ffab61;"><i class="fas fa-check"></i> Authenticated</span>'
 
         // document.getElementById('token').innerHTML = response['token'];

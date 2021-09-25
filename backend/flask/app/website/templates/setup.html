@@ -13,7 +13,7 @@
                 Authenticate the Twitch API
             </li>
             <div class="after-list">
-                <a href="https://api.twitchess.app/authenticate">
+                <a href="https://api.twitchess.app/authenticate" id="authenticate-button">
                     <button class="btn btn-dark btn-twitch">
                         <img src="/static/media/twitch_logo.png" alt="Twitch logo" style="height: 15px">
                         <strong style="margin-left:4px" id="twitch-button-text">Authenticate</strong>
@@ -22,20 +22,23 @@
             </div>
             <li>Enable the Nightbot command</li>
             <div id="nightbot-box" hidden>
-                <ul class="colored">
-                    <li>
-                        <a href="https://nightbot.tv/commands/custom" target="_blank" class="small">Add a custom
-                            command</a>, for exaple <code>!twitchess</code>, with user level Subscriber
-                    </li>
-                    <li>
-                        Use the following message for the command:
-                    </li>
-                </ul>
                 <div onclick="copyCommand(this)">
-                    <div id="nightbot-command"></div>
-                    <div style="display: inline-block; top: 0">
+                    <ul class="colored">
+                        <li>
+                            <a href="https://nightbot.tv/commands/custom" target="_blank" class="small">Add a custom
+                                command</a>, for exaple <code>!lichess</code>, with user level <u>Subscriber</u>
+                        </li>
+                        <li>
+                            Use the following message for the command:
+                        </li>
+
+                        <div id="nightbot-command"></div>
                         <i class="far fa-clipboard" id="clipboard-icon"></i><span id="copied" hidden> Copied</span>
-                    </div>
+                        <li style="margin-top: 5px">
+                            Your Twitch subscribers can then link their Twitch account to their Lichess account using
+                            <code>!lichess forkmaster99</code>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <li>All done! <a href="https://lichess.org"><u>visit Lichess</u></a></li>
