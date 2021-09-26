@@ -10,13 +10,7 @@ function setNameColors() {
                 if (subs.includes(challengerName)) {
                     challenge.getElementsByClassName("user-link")[0].style.color = "#9e84ce";
                 }
-            } catch (TypeError) {  // Invalid (or no) user/token
-                const challengeButton = document.getElementById('subscriber-challenge')
-                challengeButton.style.background = '';
-                challengeButton.style.backgroundColor = '#880909';
-                challengeButton.innerHTML = "Click here to setup Twitchess before you can accept subscriber challenges.";
-                challengeButton.onclick = () => location.href='https://www.twitchess.app/setup';
-            }
+            } catch (TypeError) {}
         })
     })
 }
@@ -87,8 +81,19 @@ function initWhenContainerLoaded() {
         // loadContainer();
         setTimeout(initWhenContainerLoaded, 100);
     }
-    document.getElementById('challenge-toggle').addEventListener("click", setNameColors);
-    document.getElementById("challenge-app").addEventListener("mouseenter", setNameColors);
+
+    chrome.runtime.sendMessage({'message': 'check_connected'}, response => {
+        if (response.valid) {
+            document.getElementById('challenge-toggle').addEventListener("click", setNameColors);
+            document.getElementById("challenge-app").addEventListener("mouseenter", setNameColors);
+        } else {
+            const challengeButton = document.getElementById('subscriber-challenge')
+            challengeButton.style.background = '';
+            challengeButton.style.backgroundColor = '#880909';
+            challengeButton.innerHTML = "Click here to setup Twitchess before you can accept subscriber challenges.";
+            challengeButton.onclick = () => location.href = 'https://www.twitchess.app/setup';
+        }
+    })
 }
 
 initWhenContainerLoaded();

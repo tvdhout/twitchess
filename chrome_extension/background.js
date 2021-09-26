@@ -45,6 +45,7 @@ function checkConnection(sendResponse){
     chrome.storage.sync.get(['user', 'sessionToken'], data => {
         if (chrome.runtime.lastError) {
             sendResponse({
+                'valid': false,
                 'message': 'failed',
                 'reason': 'Could not retrieve [user, sessionToken] from local storage.'
             });
