@@ -13,12 +13,10 @@
                 Authenticate the Twitch API
             </li>
             <div class="after-list">
-                <a href="https://api.twitchess.app/authenticate" id="authenticate-button">
-                    <button class="btn btn-dark btn-twitch">
-                        <img src="/static/media/twitch_logo.png" alt="Twitch logo" style="height: 15px">
-                        <strong style="margin-left:4px" id="twitch-button-text">Authenticate</strong>
-                    </button>
-                </a>
+                <button class="btn btn-dark btn-twitch" id="authenticate-button" onclick="authenticate()">
+                    <img src="/static/media/twitch_logo.png" alt="Twitch logo" style="height: 15px">
+                    <strong style="margin-left:4px" id="twitch-button-text">Authenticate</strong>
+                </button>
             </div>
             <li>Enable the Nightbot command</li>
             <div id="nightbot-box" hidden>
@@ -26,7 +24,7 @@
                     <ul class="colored">
                         <li>
                             <a href="https://nightbot.tv/commands/custom" target="_blank" class="small">Add a custom
-                                command</a>, for exaple <code>!lichess</code>, with user level <u>Subscriber</u>
+                                command</a>, for example <code>!lichess</code>, with user level <u>Subscriber</u>
                         </li>
                         <li>
                             Use the following message for the command:
@@ -36,7 +34,7 @@
                         <i class="far fa-clipboard" id="clipboard-icon"></i><span id="copied" hidden> Copied</span>
                         <li style="margin-top: 5px">
                             Your Twitch subscribers can then link their Twitch account to their Lichess account using
-                            <code>!lichess forkmaster99</code>
+                            <code>!lichess forkmaster99</code> in your Twitch chat.
                         </li>
                     </ul>
                 </div>

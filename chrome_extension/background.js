@@ -19,25 +19,25 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
             });
     } else if (changeInfo.status === 'complete' &&
         /^https?:\/\/(\w*\.)?twitchess\.app\/setup/.test(tab.url)) {
-        console.log("On twitchess setup page.")
+        // Set user and token
+        try {
+            const urlParams = new URLSearchParams(tab.url.match(/\?(.*)/)[0]);
+            const user = urlParams.get('user');
+            const token = urlParams.get('token');
+            if (user != null && token != null) {
+                chrome.storage.sync.set({sessionToken: token}, null);
+                chrome.storage.sync.set({user: user}, null);
+            }
+        } catch (TypeError) {
+        }
         chrome.scripting.executeScript({
             target: {tabId: tabId},
             files: ['twitchess.js']
         }, null)
-        // Set user and token
-        try{
-            const urlParams = new URLSearchParams(tab.url.match(/\?(.*)/)[0]);
-            const user = urlParams.get('user');
-            const token = urlParams.get('token');
-            if(user != null && token != null){
-                chrome.storage.sync.set({sessionToken: token}, null);
-                chrome.storage.sync.set({user: user}, null);
-            }
-        } catch (TypeError) {}
     }
 });
 
-function checkConnection(sendResponse){
+function checkConnection(sendResponse) {
     /**
      * @param sendResponse  {response} function to send a response to the message sent by the popup
      * Check if the user is connected on Twitchess.
@@ -51,7 +51,7 @@ function checkConnection(sendResponse){
             });
             return;
         }
-        fetch(`https://api.twitchess.app/${data.user}/check-token?token=${data.sessionToken}`)
+        fetch(`https://api.twitchess.app/${data.user}/check-auth?token=${data.sessionToken}`)
             .then(resp => resp.json())
             .catch(() => {
                 sendResponse({
@@ -59,7 +59,7 @@ function checkConnection(sendResponse){
                 })
             })
             .then(resp => {
-                const valid = resp['valid']
+                const valid = resp.valid;
                 sendResponse({
                     'valid': valid,
                     'user': valid ? data.user : null,
@@ -69,15 +69,11 @@ function checkConnection(sendResponse){
     })
 }
 
-function getSubs(sendResponse) {
-    /**
-     * @param sendResponse  {response} function to send a response to the message sent by the frontend
-     * Retrieve a list of lichess names of users that are subscribed on Twitch.
-     */
+function retrieveSubs(sendResponse){
     chrome.storage.sync.get(['user', 'sessionToken'], data => {
         if (chrome.runtime.lastError) {
             sendResponse({
-                'message': 'failed',
+                'success': false,
                 'reason': 'Could not retrieve [user, sessionToken] from local storage.'
             });
             return;
@@ -85,12 +81,42 @@ function getSubs(sendResponse) {
         fetch(`https://api.twitchess.app/${data.user}?token=${data.sessionToken}`)
             .then(resp => resp.json())
             .then(subs => {
-                sendResponse({
-                    'message': 'success',
-                    'data': {'subs': subs}
-                });
+                if (Array.isArray(subs)) {
+                    sendResponse({
+                        'success': true,
+                        'data': {'subs': subs}
+                    });
+                    chrome.storage.sync.set({subs: subs}, null);
+                    chrome.storage.sync.set({subsDate: new Date().toJSON()}, null);
+                } else {
+                    sendResponse({
+                        'success': false,
+                        'reason': 'API did not return a list of subscribers.'
+                    });
+                }
             });
-    })
+    });
+}
+
+function getSubs(sendResponse) {
+    /**
+     * @param sendResponse  {response} function to send a response to the message sent by the frontend
+     * Get a recent list of subs from storage (20 sec), otherwise retrieve them from the API.
+     */
+    chrome.storage.sync.get(['subs', 'subsDate'], data => {
+        if (chrome.runtime.lastError) {
+            retrieveSubs(sendResponse);
+        } else {
+            if (new Date(data.subsDate).getTime() > ((new Date()).getTime() - 10000)) {
+                sendResponse({
+                    'success': true,
+                    'data': {'subs': data.subs}
+                });
+            } else {
+                retrieveSubs(sendResponse);
+            }
+        }
+    });
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

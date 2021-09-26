@@ -10,9 +10,9 @@ api = Api(api_blueprint)
 
 
 # ======== Add routes
-api.add_resource(CheckToken, '/<string:user>/check-token')
+api.add_resource(CheckAuthentication, '/<string:user>/check-auth')
+api.add_resource(NewToken, '/<string:user>/new-token')
 api.add_resource(Authenticate, '/authenticate')
-# api.add_resource(Authenticate, '/authenticate/new-token')
 api.add_resource(AuthenticateRedirect, '/twitch-redirect')
 
 api.add_resource(Subscribers, '/<string:user>')

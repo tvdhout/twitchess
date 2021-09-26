@@ -3,7 +3,7 @@
 chrome.runtime.sendMessage({'message': 'check_connected'}, response => {
     document.getElementById('dots').hidden = true;
 
-    if(response['valid']){
+    if(response.valid){
         document.getElementById('connected').hidden = false;
         document.getElementById('help-box').hidden = false;
         document.getElementById('not-connected').hidden = true;

@@ -15,8 +15,7 @@ function copyCommand() {
         })
 }
 
-let howExtra = 1;
-function makeExtraSpecial(el){
-    howExtra++;
-    el.innerHTML = "extra ".repeat(howExtra);
+function authenticate(){
+    document.getElementById('twitch-button-text').innerHTML = "Please wait...";
+    location.href = 'https://api.twitchess.app/authenticate';
 }

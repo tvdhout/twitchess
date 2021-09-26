@@ -21,3 +21,8 @@ def faq():
 @website_blueprint.route('/not-eligible')
 def not_elibigle():
     return render_template("not-eligible.html")
+
+
+@website_blueprint.route('/error')
+def error():
+    return render_template("error.html")

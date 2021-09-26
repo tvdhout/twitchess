@@ -3,16 +3,18 @@ document.getElementById('install-extension').innerHTML = '<strike>Install the Tw
 chrome.runtime.sendMessage({'message': 'check_connected'}, response => {
     if(response.valid){
         document.getElementById('twitch-button-text').innerHTML = 'Generate new token';
-        document.getElementById('authenticate-button').href = 'https://api.twitchess.app/authenticate/new-token'
+        document.getElementById('authenticate-button').onclick = () => newToken(response.user, response.token);
         document.getElementById('authentication-text').innerHTML = '<strike>Authenticate the Twitch API</strike> <span style="color:#ffab61;"><i class="fas fa-check"></i> Authenticated</span>'
 
-        // document.getElementById('token').innerHTML = response['token'];
-        // document.getElementById('token-box').value = response['token'];
-        // document.getElementById('token-box').hidden = false;
-        // document.getElementById('token-label').hidden = false;
-
         const codebox = document.getElementById('nightbot-command');
-        codebox.innerHTML = `$(eval ($(urlfetch https://api.twitchess.app/${response['user']}/create?twitch=$(user)&lichess=$(querystring)&token=${response['token']})))`
+        codebox.innerHTML = `$(eval ($(urlfetch https://api.twitchess.app/${response.user}/create?twitch=$(user)&lichess=$(querystring)&token=${response.token})))`
         document.getElementById('nightbot-box').hidden = false;
+    } else {
+        console.log("Not connected")
     }
 });
+
+function newToken(user, token){
+    document.getElementById('twitch-button-text').innerHTML = "Please wait...";
+    location.href = `https://api.twitchess.app/${user}/new-token?token=${token}`;
+}

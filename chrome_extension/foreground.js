@@ -1,5 +1,9 @@
 function setNameColors() {
     chrome.runtime.sendMessage({'message': 'get_subs'}, response => {
+        if (!response.success){
+            notConnected();
+            return;
+        }
         const subs = response.data.subs;
         const challenges = document.getElementsByClassName("challenge");
 
@@ -18,15 +22,19 @@ function setNameColors() {
 function acceptRandomChallenge(){
     const challenges = document.getElementsByClassName("challenge");
     if (challenges.length > 0){
-        const challenge = challenges[Math.floor(Math.random() * challenges.length)]
+        const challenge = challenges[Math.floor(Math.random() * challenges.length)];
         challenge.getElementsByClassName("accept")[0].click();
     }
 }
 
 function acceptSubscriberChallenge(){
-    const challenges = document.getElementsByClassName("challenge");
-
     chrome.runtime.sendMessage({'message': 'get_subs'}, response => {
+        if (!response.success){
+            notConnected();
+            return;
+        }
+
+        const challenges = document.getElementsByClassName("challenge");
         const subs = response.data.subs;
         let subChallenges = [];
 
@@ -67,9 +75,9 @@ function init() {
     subChallengeDiv.innerText = "Accept subscriber challenge";
     subChallengeDiv.id = "subscriber-challenge";
     subChallengeDiv.onclick = acceptSubscriberChallenge;
-    subChallengeDiv.style.background = `#6441A4 url('${chrome.runtime.getURL('images/twitch_logo.png')}') no-repeat left center`
-    subChallengeDiv.style.backgroundSize = "19px 19px"
-    subChallengeDiv.style.backgroundOrigin = 'content-box'
+    subChallengeDiv.style.background = `#6441A4 url('${chrome.runtime.getURL('images/twitch_logo.png')}') no-repeat left center`;
+    subChallengeDiv.style.backgroundSize = "19px 19px";
+    subChallengeDiv.style.backgroundOrigin = 'content-box';
     container.prepend(subChallengeDiv);
 }
 
@@ -78,7 +86,6 @@ function initWhenContainerLoaded() {
     if (container.className.indexOf("rendered") > 0) {
         init();
     } else {
-        // loadContainer();
         setTimeout(initWhenContainerLoaded, 100);
     }
 
@@ -87,13 +94,17 @@ function initWhenContainerLoaded() {
             document.getElementById('challenge-toggle').addEventListener("click", setNameColors);
             document.getElementById("challenge-app").addEventListener("mouseenter", setNameColors);
         } else {
-            const challengeButton = document.getElementById('subscriber-challenge')
-            challengeButton.style.background = '';
-            challengeButton.style.backgroundColor = '#880909';
-            challengeButton.innerHTML = "Click here to setup Twitchess before you can accept subscriber challenges.";
-            challengeButton.onclick = () => location.href = 'https://www.twitchess.app/setup';
+            notConnected();
         }
     })
+}
+
+function notConnected(){
+    const challengeButton = document.getElementById('subscriber-challenge')
+    challengeButton.style.background = '';
+    challengeButton.style.backgroundColor = '#880909';
+    challengeButton.innerHTML = "Click here to setup Twitchess before you can accept subscriber challenges.";
+    challengeButton.onclick = () => location.href = 'https://www.twitchess.app/setup';
 }
 
 initWhenContainerLoaded();

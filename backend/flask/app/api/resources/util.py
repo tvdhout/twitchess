@@ -1,14 +1,16 @@
 from datetime import datetime
 from typing import Union, Tuple, Dict
 from flask_restful import reqparse
-from flask import g
+from flask import g, redirect
 from sqlalchemy.orm.exc import NoResultFound
 
+from app.logging import get_logger
 from app.api.database import engine
 from app.api.database.models import Base
 from app.api.database.models.Authentication import User, Authentication
 
-__all__ = ['get_all_tables', 'get_table', 'safe_str_cmp', 'validate_token', 'get_user_auth']
+__all__ = ['get_all_tables', 'get_table', 'safe_str_cmp', 'validate_token', 'get_user_auth', 'error']
+LOGGER = get_logger('util')
 
 
 def get_all_tables() -> Dict[str, Base]:
@@ -58,3 +60,8 @@ def get_user_auth(user: str, session=None) -> Union[Authentication, None]:
     except NoResultFound:
         return None
     return auth
+
+
+def error(message: str):
+    LOGGER.error(message)
+    return redirect('https://www.twitchess.app/error')
