@@ -138,3 +138,7 @@ dmypy.json
 
 # Mac
 .DS_Store
+
+# Chrome extension
+*.crx
+*.pem
