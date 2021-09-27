@@ -102,6 +102,7 @@ class Subscribers(Resource):
                 resp.raise_for_status()
             except requests.exceptions.HTTPError:
                 logger.error(f"Twitch API responded with unexepected status code {resp.status_code}")
+                return
 
             # Request successful
             data = resp.json()
