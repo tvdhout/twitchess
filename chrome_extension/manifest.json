@@ -24,21 +24,40 @@
     }
   },
   "permissions": [
-    "tabs",
     "storage",
     "scripting"
   ],
-  "host_permissions": [
-      "https://*.lichess.org/*",
-      "https://lichess.org/*",
-      "https://*.twitchess.app/*"
-    ],
-  "web_accessible_resources": [{
-    "resources": ["images/twitch_logo.png"],
-    "matches": [
-      "*://*.lichess.org/*",
-      "*://lichess.org/*",
-      "https://*.twitchess.app/*"
-    ]
-  }]
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.lichess.org/*",
+        "*://lichess.org/*"
+      ],
+      "css": [
+        "lichess.css"
+      ],
+      "js": [
+        "lichess.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://www.twitchess.app/setup*"
+      ],
+      "js": [
+        "twitchess.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "images/twitch_logo.png"
+      ],
+      "matches": [
+        "*://*.lichess.org/*",
+        "*://lichess.org/*"
+      ]
+    }
+  ]
 }

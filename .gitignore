@@ -142,3 +142,6 @@ dmypy.json
 # Chrome extension
 *.crx
 *.pem
+
+# Zip
+*.zip
