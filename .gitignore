@@ -145,3 +145,6 @@ dmypy.json
 
 # Zip
 *.zip
+
+# Utilities
+util/
