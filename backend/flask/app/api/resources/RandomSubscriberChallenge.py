@@ -63,6 +63,7 @@ class Subscribers(Resource):
                 auth = get_user_auth(user, session=session)
                 if auth is None:
                     logger.error(f"No authentication object found for {user}")
+                    return
 
             resp = requests.get(f"https://api.twitch.tv/helix/subscriptions"
                                 f"?broadcaster_id={auth.userid}"
@@ -75,11 +76,13 @@ class Subscribers(Resource):
 
             if resp.status_code == 400:
                 logger.error('User must be a Twitch partner or affiliate.')
+                return
             elif resp.status_code == 401:
                 # Unauthorized, try to refresh access token
                 if token_refreshed:
                     # Access token is recently refreshed, but still not authorized
-                    logger.critical("No valid access token available, please reauthorize application")
+                    logger.error("No valid access token available, please reauthorize application")
+                    return
                 refresh_successful = Authenticate.refresh(user, session=session)
                 if refresh_successful:
                     token_refreshed = True
@@ -87,6 +90,7 @@ class Subscribers(Resource):
                     continue
                 else:
                     logger.error(f"Could not refresh an unauthorized token, reautherize application")
+                    return
             elif resp.status_code == 429:
                 # Twitch API rate limit hit (800 / minute)
                 sleep(2)
@@ -97,6 +101,7 @@ class Subscribers(Resource):
                     retry_503 = False
                     continue
                 logger.error("Twitch API returned 503. Check https://devstatus.twitch.tv/")
+                return
 
             try:
                 resp.raise_for_status()
