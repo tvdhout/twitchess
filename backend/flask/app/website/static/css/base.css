@@ -1,17 +1,17 @@
 @import url('//fonts.googleapis.com/css2?family=Hind:wght@600&display=swap');
 
 body {
-    background-color: #0c5460;
+    background-color: #001d24;
     color: whitesmoke;
 }
 
 ::-moz-selection { /* Code for Firefox */
-    color: #0c5460;
+    color: #001d24;
     background: whitesmoke;
 }
 
 ::selection {
-    color: #0c5460;
+    color: #001d24;
     background: whitesmoke;
 }
 

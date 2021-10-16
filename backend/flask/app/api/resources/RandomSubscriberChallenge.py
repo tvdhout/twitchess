@@ -46,6 +46,8 @@ class Subscribers(Resource):
         [DELETE] method
         Purge users from the database that are no longer subscribed.
         """
+        if user == 'stockvis':  # Developer is not a Twitch affiliate
+            return
         logger = get_logger('remove_non_subs')
         logger.info(f"========== Called purge_nonsubs({user}) ==========")
 
@@ -92,7 +94,7 @@ class Subscribers(Resource):
                     logger.error(f"Could not refresh an unauthorized token, reautherize application")
                     return
             elif resp.status_code == 429:
-                # Twitch API rate limit hit (800 / minute)
+                # Twitch API rate limit hit (800 / minute), very unlikely to happen.
                 sleep(2)
                 continue
             elif resp.status_code == 503:

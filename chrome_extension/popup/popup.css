@@ -1,12 +1,12 @@
 /*@import url('//fonts.googleapis.com/css2?family=Hind');*/
 
 ::-moz-selection { /* Code for Firefox */
-    color: #0c5460;
+    color: #001d24;
     background: whitesmoke;
 }
 
 ::selection {
-    color: #0c5460;
+    color: #001d24;
     background: whitesmoke;
 }
 
@@ -15,7 +15,7 @@ body {
     height: 200px;
     font-family: Hind, monospace;
     font-size: 20px;
-    background-color: #0c5460;
+    background-color: #001d24;
     color: whitesmoke;
     display: block;
     text-align: center;
@@ -34,18 +34,22 @@ span#title {
 
 button {
     background-color: #ffab61;
-    color: #0c5460;
+    color: #001d24;
     border-radius: 4px;
     cursor: pointer;
 }
 
 div#help-box{
     background-color: #ffab61;
-    color: #0c5460;
+    color: #001d24;
     font-size: medium;
     position: absolute;
     bottom: 0;
     right: 0;
     padding: 1px 6px 0 6px;
     border-radius: 5px 0 0 0;
+}
+
+a:hover{
+    text-decoration: none;
 }

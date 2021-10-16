@@ -3,8 +3,13 @@ from logging.handlers import RotatingFileHandler
 
 __all__ = ['get_logger']
 
+loggers = dict()
+
 
 def get_logger(name: str, level: str = 'INFO', max_file_size: int = int(2e6)) -> logging.Logger:
+    if loggers.get(name):
+        return loggers.get(name)
+
     logger = logging.getLogger(name)
 
     file_handler = RotatingFileHandler(f'/logging/{name}.log', maxBytes=max_file_size)

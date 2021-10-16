@@ -5,8 +5,8 @@ function checkConnection(sendResponse) {
      * @param sendResponse  {response} function to send a response to the message sent by the popup
      * Check if the user is connected on Twitchess.
      */
-    chrome.storage.sync.get(['user', 'sessionToken'], data => {
-        if (chrome.runtime.lastError) {
+    chrome.storage.local.get(['user', 'sessionToken'], data => {
+        if (typeof data.user === 'undefined' || typeof data.sessionToken === 'undefined') {
             sendResponse({
                 'valid': false,
                 'message': 'failed',
@@ -29,11 +29,12 @@ function checkConnection(sendResponse) {
                     'token': valid ? data.sessionToken : null
                 });
             });
-    })
+
+    });
 }
 
-function retrieveSubsFromAPI(sendResponse){
-    chrome.storage.sync.get(['user', 'sessionToken'], data => {
+function retrieveSubsFromAPI(sendResponse) {
+    chrome.storage.local.get(['user', 'sessionToken'], data => {
         if (chrome.runtime.lastError) {
             sendResponse({
                 'success': false,
@@ -49,8 +50,8 @@ function retrieveSubsFromAPI(sendResponse){
                         'success': true,
                         'data': {'subs': subs}
                     });
-                    chrome.storage.sync.set({subs: subs}, null);
-                    chrome.storage.sync.set({subsDate: new Date().toJSON()}, null);
+                    chrome.storage.local.set({subs: subs}, null);
+                    chrome.storage.local.set({subsDate: new Date().toJSON()}, null);
                 } else {
                     sendResponse({
                         'success': false,
@@ -66,7 +67,7 @@ function getSubs(sendResponse) {
      * @param sendResponse  {response} function to send a response to the message sent by the frontend
      * Get a recent list of subs from storage (20 sec), otherwise retrieve them from the API.
      */
-    chrome.storage.sync.get(['subs', 'subsDate'], data => {
+    chrome.storage.local.get(['subs', 'subsDate'], data => {
         if (chrome.runtime.lastError) {  // Data not found in storage
             retrieveSubsFromAPI(sendResponse);
         } else {
@@ -93,5 +94,5 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         default:
     }
 
-    return true;  // Keep communication between foreground and background alive during async code above.
+    return true;  // Keep communication between foreground and background alive during alocal code above.
 })

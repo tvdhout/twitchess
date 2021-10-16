@@ -56,11 +56,6 @@ function acceptSubscriberChallenge(){
 }
 
 function init() {
-    // Click on the challenge menu to render it on first visit.
-    const challengeToggle = document.getElementById("challenge-toggle");
-    challengeToggle.click();
-    challengeToggle.click();
-
     const container = document.getElementById("challenge-app");
 
     // Add random challenge button
@@ -82,11 +77,16 @@ function init() {
 }
 
 function initWhenContainerLoaded() {
-    const container = document.getElementById("challenge-app");
+    const challengeToggle = document.getElementById("challenge-toggle");
+    challengeToggle.click();
+    challengeToggle.click();
+
+    let container = document.getElementById("challenge-app");
     if (container.className.indexOf("rendered") > 0) {
         init();
     } else {
-        setTimeout(initWhenContainerLoaded, 100);
+        setTimeout(initWhenContainerLoaded, 500);
+        return;
     }
 
     chrome.runtime.sendMessage({'message': 'check_connected'}, response => {
@@ -96,14 +96,14 @@ function initWhenContainerLoaded() {
         } else {
             notConnected();
         }
-    })
+    });
 }
 
 function notConnected(){
     const challengeButton = document.getElementById('subscriber-challenge')
     challengeButton.style.background = '';
-    challengeButton.style.backgroundColor = '#880909';
-    challengeButton.innerHTML = "Click here to setup Twitchess before you can accept subscriber challenges.";
+    challengeButton.style.backgroundColor = '#001d24';
+    challengeButton.innerHTML = '<b>Not connected! <span style="color: #ffab61">Click here</span> to setup Twitchess.</b>';
     challengeButton.onclick = () => location.href = 'https://www.twitchess.app/setup';
 }
 
