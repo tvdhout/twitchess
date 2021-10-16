@@ -15,6 +15,11 @@ services:
       - 8080
     networks:
       - main
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
 
   nginx:
     image: nginx
@@ -31,6 +36,11 @@ services:
     networks:
       - main
       - mainipv6
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
 
   certbot:
     image: certbot/certbot
@@ -42,6 +52,11 @@ services:
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     networks:
       - main
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "1"
+        max-size: "10m"
 
   postgres:
     image: postgres
@@ -56,6 +71,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - main
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "1"
+        max-size: "10m"
 
   ipv6nat:
     container_name: ipv6nat
@@ -66,6 +86,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /lib/modules:/lib/modules:ro
+    logging:
+      driver: "none"
 
 volumes:
   postgres_data:
