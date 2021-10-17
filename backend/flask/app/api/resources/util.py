@@ -42,7 +42,9 @@ def validate_token(user: str, verbose: bool = False) -> Union[bool, Tuple[bool, 
     parser.add_argument('token', type=str, required=True)
     args = parser.parse_args()
     try:
-        row = g.session.query(User).filter(User.username == user).one()
+        row = g.session.query(User).filter(User.username == user).first()
+        if row is None:
+            raise NoResultFound
         token, last_purged = row.token, row.last_purged
     except NoResultFound:
         return (False, None, None) if verbose else False
