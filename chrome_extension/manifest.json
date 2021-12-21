@@ -1,7 +1,7 @@
 {
   "name": "Twitchess",
   "description": "Accept Lichess challenges from Twitch subscribers.",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Thijs van den Hout",
   "homepage_url": "https://www.twitchess.app",
   "manifest_version": 3,

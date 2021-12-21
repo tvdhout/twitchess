@@ -5,8 +5,8 @@ try {
     const user = urlParams.get('user');
     const token = urlParams.get('token');
     if (user != null && token != null) {
-        chrome.storage.local.set({sessionToken: token}, null);
-        chrome.storage.local.set({user: user}, null);
+        chrome.storage.sync.set({sessionToken: token}, null);
+        chrome.storage.sync.set({user: user}, null);
     }
 } catch (TypeError) {
 }
